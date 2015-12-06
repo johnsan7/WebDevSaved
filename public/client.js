@@ -311,7 +311,7 @@ function buttonAssign()
 								
 								var dateInput = document.createElement('input');
 								dateInput.type = 'date';
-								dateInput.value = date_format(editResponse[0].date,"%Y-%m-%d");
+								dateInput.value =  editResponse[0].date.split("T")[0];
 								dateInput.id = 'editDate';
 								
 								
