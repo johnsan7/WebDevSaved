@@ -1,17 +1,16 @@
 
-//This code, var express through app.set('port',3000) is code from lectures and the class. The implementation that I have is the exact same as the lectures
-//This program is a game where there are 100 random zip codes from US locations. You have to guess the temperature within 5 degrees without knowing the name
-//of the city. You get 3 points for a correct answer and lose 1 point for an incorrect. 
+/* Andrew Johnson, Web Development, Assignment 10
 
+Much of the basic syntax of this code was learned in lectures from Professor Wolford, but I have my own implementation.  
 
+*/
 
-
-
+//When content loads, assign buttons and draw the table. 
 
 document.addEventListener('DOMContentLoaded', buttonSet);
 document.addEventListener('DOMContentLoaded', function()
 		{
-			console.log("DOM DRAW called ------------------------------------------------")
+			//console.log("DOM DRAW called ------------------------------------------------")
 			drawTable();
 		});
 			
@@ -25,35 +24,39 @@ function reset_table()
 		drawTable();
 	});
 }
-//This is the basic code of the game. 
 
-//Deleted all of the node listeners, this is straight Javascript. 
+//This function is a very big one. When it is called, it makes an AJAX request to the database service and gets the current database data. Next it checks if there is already a table.
+//If there is already a table, it removes it then builds a new table. The table does not get rendered by the server, this is a static javascript document we are in, it 
+//builds the form itself. After every row of data, it adds a delete button, then a hidden field with id, then an edit button, then a hidden field with id. It then appends the table.
+//Next it calls buttonAssign, which assigns functions for both the delete and edit buttons.
 
 function drawTable()
 {
 	var req = new XMLHttpRequest();
 	
-console.log("gets into drawTable at least");
+//console.log("gets into drawTable at least");
 
 	//This removes the current table if there is one
 	if(document.getElementById("dataTable") != null)
 	{			
-		console.log("Table deleting triggered -------------------------------------------------------------------------------------------------");
+		//console.log("Table deleting triggered -------------------------------------------------------------------------------------------------");
 		var eltable = document.getElementById("dataTable");
 		eltable.parentNode.removeChild(eltable);
 
 		
 	}
 	
+	//Sending get request, the response here is just everything in the database so that it can draw the table. 
 	req.open('GET', 'http://ec2-52-26-46-121.us-west-2.compute.amazonaws.com:1976/tables', true);
 	req.addEventListener('load', function()
 	{
 		if(req.status >= 200 && req.status < 400)
 		{
-			//console.log("Request was returned");
-			//console.log("Respons was: ", req.responseText);
+
 			var response = JSON.parse(req.responseText);  
-			//console.log("after parsing response was: ", response);
+		
+		//The code below is creating the table and all of the elements
+		
 			var newTable = document.createElement('table');
 			newTable.id="dataTable";
 			
@@ -61,7 +64,7 @@ console.log("gets into drawTable at least");
 			var newRow = document.createElement('tr');
 			var newBody = document.createElement("tbody");
 			
-			//console.log("Created header stubs");		
+			
 			
 			var nameTitle = document.createElement('th');
 			nameTitle.textContent = 'Name';
@@ -84,18 +87,18 @@ console.log("gets into drawTable at least");
 			newRow.appendChild(lbsTitle);
 			
 			newHead.appendChild(newRow);
-			//The above should build the header. Next we can do the actual data in the body
-			//Now we need to build the body, and to do that we need to do a loop, I think for each will work. 
-			//console.log("Appended headers to head");		
+
+			///The above built the header of the table, it is the same every time. Below is the body of the table being built, we use a loop since we don't know how many items
+			
 			for(var thing in response)
 			{
-				//console.log("Appending rows in loop");
+				
 				var nextRow = document.createElement('tr');
 				
 				var nameBox = document.createElement('td');
 				nameBox.textContent=response[thing].name;
 				nextRow.appendChild(nameBox);
-				//console.log("Doing name: ", response[thing].name);
+			
 				var repsBox = document.createElement('td');
 				repsBox.textContent=response[thing].reps;
 				nextRow.appendChild(repsBox);
@@ -126,8 +129,7 @@ console.log("gets into drawTable at least");
 				
 				var editButton = document.createElement('button');
 				
-				//The next two blocks hopefully create hidden data items with the id that follows each button.
-				//I hope to be able to access them since they are siblings. 
+				//The next two blocks create hidden data items with the id that follows each button.
 				
 				var hidDeleteID = document.createElement('hidden');
 				hidDeleteID.name="hidden thing";
@@ -148,7 +150,7 @@ console.log("gets into drawTable at least");
 				deleteButton.className="deleteButton";
 				editButton.className="editButton";
 				
-				//This sets up a closure so the correct deleteButton gets passed
+				
 
 				buttonRow.appendChild(deleteButton);
 				buttonRow.appendChild(hidDeleteID);
@@ -165,6 +167,8 @@ console.log("gets into drawTable at least");
 
 			document.body.appendChild(newTable);
 
+			//Table was just appended to the body, now we assign the buttons.
+			
 			buttonAssign();
 			
 
@@ -182,11 +186,17 @@ console.log("gets into drawTable at least");
 	event.preventDefault();	
 }
 
+/*	This is relatively complicated function. I struggled quite a bit with getting this right. Each delete button needs to be assigned a function where it sends a request to delete
+And it needs to have the ID with it. I finally decided I needed to do a closure to do this, because every delete button would send the last number if I didn't do a closure. 
+*/
+
 function buttonAssign()
 {
 	var delReq = new XMLHttpRequest();
 //This sets up the delete buttons
 	var deleteButtons = document.getElementsByClassName("deleteButton");
+	
+	//Loop through every delete button
 	for(var j=0; j<deleteButtons.length; j++)
 	{
 		deleteButtons[j].onclick = (function(delBut)
@@ -201,13 +211,8 @@ function buttonAssign()
 							if(delReq.status >= 200 && delReq.status < 400)
 							{
 								document.body.removeChild;
-								//console.log("Great, deleted row");
-								//console.log("Row index test, row index is:", delBut.rowIndex);
-								//delBut.nextSibling.nextSibling.nextSibling.removeNode;
-								//delBut.nextSibling.nextSibling.removeNode;
-								//delBut.nextSibling.removeNode;
-								//delBut.parentNode.removeChild(delBut);
-								console.log("Drawing table in button Assign --------------------------------------------------------------")
+
+								//console.log("Drawing table in button Assign --------------------------------------------------------------")
 								drawTable();
 							}
 							else
@@ -228,6 +233,11 @@ function buttonAssign()
 	}
 //This sets up the edit buttons
 
+	/*These were actually easier in that they do not need a closure, but more complicated otherwise. Instead of going to another page and ruining the AJAX atmosphere
+	I decided that when the user clicks an edit button, it should generate a small form below the table where they can change the data. This form is deleted after, or if a different edit 
+	button is clicked a new form is there. It does a request to get all of the information that already exists. That way I can just do a simple update. If the user intentionally deleted
+	the information that is there, they must mean to get rid of it. 
+	*/
 
 	var editButtons = document.getElementsByClassName("editButton");
 	for(var j=0; j<editButtons.length; j++)
@@ -259,11 +269,11 @@ function buttonAssign()
 							
 								}
 								
-						
-								console.log("getting into response");
+								//The next lines build that little form with content from the request. 
+								
 								var editResponse = JSON.parse(updateReq.responseText);
 								
-								console.log("here is the response name", editResponse[0].name);
+								
 								
 								var efDiv = document.createElement('div');
 								
@@ -391,6 +401,10 @@ function buttonAssign()
 	
 }
 
+/*	This function works hand in hand with the edit buttons that were just created. When the user edits the information and clicks to send it, this function intercepts the form request. 
+	It sends the data to simple-update on the server. 
+
+*/
 
 function editFormCatcher()
 {
@@ -454,6 +468,9 @@ function editFormCatcher()
 }
 
 
+/*
+	This intercepts the request to insert data into the database. It sends it to the correct server and adds the information. 
+*/
 
 function buttonSet()
 {
