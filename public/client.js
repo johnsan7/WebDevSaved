@@ -311,10 +311,13 @@ function buttonAssign()
 								
 								var dateInput = document.createElement('input');
 								dateInput.type = 'date';
-								dateInput.value = editResponse[0].date;
+								dateInput.value = date_format(editResponse[0].date,"%Y-%m-%d");
 								dateInput.id = 'editDate';
 								
+								
 								var edDateTitle = document.createTextNode('Date:, if you enter no date, it will be updated to null');
+								
+								
 								
 								var radio1 = document.createElement('input');
 								radio1.type = 'radio';
