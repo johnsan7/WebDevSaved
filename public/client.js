@@ -315,7 +315,7 @@ function buttonAssign()
 								dateInput.id = 'editDate';
 								//Hubtest
 								
-								var edDateTitle = document.createTextNode('Date:, if you enter no date, it will be updated to null');
+								var edDateTitle = document.createTextNode('Date:');
 								
 								
 								
